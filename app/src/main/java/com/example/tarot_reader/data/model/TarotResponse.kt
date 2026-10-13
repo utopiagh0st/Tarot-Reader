@@ -1,8 +1,11 @@
 package com.example.tarot_reader.data.model
 
-class TarotResponse {
-    val nhits: Int
+data class TarotResponse(
+    val nhits: Int,
     val cards: List<TarotCard>
-    
-    fun getCards()
+) {
+    @JvmName("getCardsListCustom")
+    fun getCards(): List<TarotCard> {
+        return cards
+    }
 }

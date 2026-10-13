@@ -1,7 +1,7 @@
 package com.example.tarot_reader.utils
 
-class NetworkResult {
-    fun Success()
-    fun Error()
-    object Loading
+sealed class NetworkResult<T> {
+    data class Success<T>(val data: T) : NetworkResult<T>()
+    data class Error<T>(val message: String) : NetworkResult<T>()
+    object Loading : NetworkResult<Nothing>()
 }
