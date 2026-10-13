@@ -1,65 +1,32 @@
 package com.example.tarot_reader.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tarot_reader.data.repository.TarotApiRepository
+import com.example.tarot_reader.data.TarotRepository
 import com.example.tarot_reader.ui.state.TarotUiState
-import kotlinx.coroutines.Dispatchers
+import com.example.tarot_reader.util.Resultado
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class TarotViewModel(
-    val repository: TarotApiRepository
+    private val repository: TarotRepository = TarotRepository()
 ) : ViewModel() {
 
-    private val _uiState = MutableLiveData<TarotUiState>()
-    val uiState: LiveData<TarotUiState> = _uiState
+    private val _uiState = MutableStateFlow<TarotUiState>(TarotUiState.Cargando)
+    val uiState: StateFlow<TarotUiState> = _uiState.asStateFlow()
 
-    fun getRandomCard() {
-        _uiState.value = TarotUiState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val card = repository.getRandomCard()
-                _uiState.postValue(TarotUiState.Success(listOf(card)))
-            } catch (e: Exception) {
-                _uiState.postValue(TarotUiState.Error(e.localizedMessage ?: "Error al conectar con la API"))
-            }
-        }
+    init {
+        cargarCincoCartasAleatorias()
     }
 
-    fun getAllCards() {
-        _uiState.value = TarotUiState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val cards = repository.getAllCards()
-                _uiState.postValue(TarotUiState.Success(cards))
-            } catch (e: Exception) {
-                _uiState.postValue(TarotUiState.Error(e.localizedMessage ?: "Error al conectar con la API"))
-            }
-        }
-    }
-
-    fun getCourtCards() {
-        _uiState.value = TarotUiState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val cards = repository.getCourtCards()
-                _uiState.postValue(TarotUiState.Success(cards))
-            } catch (e: Exception) {
-                _uiState.postValue(TarotUiState.Error(e.localizedMessage ?: "Error al conectar con la API"))
-            }
-        }
-    }
-
-    fun getCardById(id: String) {
-        _uiState.value = TarotUiState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val card = repository.getCardById(id)
-                _uiState.postValue(TarotUiState.Success(listOf(card)))
-            } catch (e: Exception) {
-                _uiState.postValue(TarotUiState.Error(e.localizedMessage ?: "Error al conectar con la API"))
+    fun cargarCincoCartasAleatorias() {
+        _uiState.value = TarotUiState.Cargando
+        viewModelScope.launch {
+            when (val resultado = repository.obtenerCartasAleatorias(5)) {
+                is Resultado.Exito -> _uiState.value = TarotUiState.Exito(resultado.datos)
+                is Resultado.Error -> _uiState.value = TarotUiState.Error(resultado.mensaje)
             }
         }
     }
