@@ -2,7 +2,7 @@ package com.example.tarot_reader.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tarot_reader.data.TarotRepository
+import com.example.tarot_reader.data.PokemonRepository
 import com.example.tarot_reader.ui.state.TarotUiState
 import com.example.tarot_reader.util.Resultado
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class TarotViewModel(
-    private val repository: TarotRepository = TarotRepository()
+    private val repository: PokemonRepository = PokemonRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TarotUiState>(TarotUiState.Cargando)
